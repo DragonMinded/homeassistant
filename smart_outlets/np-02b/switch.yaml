@@ -1,0 +1,17 @@
+switch:
+ - platform: command_line
+   scan_interval: 5
+   switches:
+     outlet:
+       command_on: "./setoutlet <ip> <outlet> 1"
+       command_off: "./setoutlet <ip> <outlet> 0"
+       command_state: "./fetchoutlet <ip> <outlet>"
+       value_template: '{{ value == "1" }}'
+       friendly_name: Outlet
+       unique_id: outlet
+       icon_template: >-
+          {% if value == "1" %}
+            mdi:light-switch
+          {% else %}
+            mdi:light-switch-off
+          {% endif %}

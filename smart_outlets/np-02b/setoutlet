@@ -1,0 +1,11 @@
+#! /usr/bin/python3
+
+import sys
+import requests
+
+username = "admin"
+password = "admin"
+host = sys.argv[1]
+outlet = int(sys.argv[2])
+state = int(sys.argv[3])
+requests.get(f"http://{username}:{password}@{host}/cmd.cgi?$A3 {outlet} {state}", timeout=1.0)
