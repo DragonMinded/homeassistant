@@ -2,18 +2,40 @@
 
 import sys
 import requests
+import xml.etree.ElementTree as ET
 
+# Outlet should be "1" for first, "2" for second.
 username = "admin"
 password = "admin"
 host = sys.argv[1]
 outlet = int(sys.argv[2])
 response = requests.get(f"http://{username}:{password}@{host}/cmd.cgi?$A5", timeout=1.0).content.decode('utf-8')
-if '$' in response:
-    raise Exception("Couldn't fetch outlet state!")
-if outlet == 1:
-    print("1" if response[1] != '0' else "0")
-    sys.exit(0)
-if outlet == 2:
-    print("1" if response[0] != '0' else "0")
-    sys.exit(0)
-raise Exception("Unknown outlet!")
+
+# There are two types of response here, if it returns "Success!" then
+# it doesn't respond to the correct documented protocol.
+if response.strip() == "Success!":
+    if outlet == 1:
+        relay = "rly0"
+    elif outlet == 2:
+        relay = "rly1"
+    else:
+        raise Exception("Unknown outlet!")
+
+    response = requests.get(f"http://{username}:{password}@{host}/status.xml", timeout=1.0).content.decode('utf-8')
+    root = ET.fromstring(response)
+    if root.tag == "response":
+        for child in root:
+            if child.tag == relay:
+                print("1" if child.text != '0' else "0")
+                sys.exit(0)
+    raise Exception("Cannot determine status")
+else:
+    if '$' in response:
+        raise Exception("Couldn't fetch outlet state!")
+    if outlet == 1:
+        print("1" if response[1] != '0' else "0")
+        sys.exit(0)
+    if outlet == 2:
+        print("1" if response[0] != '0' else "0")
+        sys.exit(0)
+    raise Exception("Unknown outlet!")

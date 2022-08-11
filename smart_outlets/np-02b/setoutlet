@@ -2,10 +2,37 @@
 
 import sys
 import requests
+import xml.etree.ElementTree as ET
 
+# Outlet should be "1" for first, "2" for second, and state should be "1" or "0" for on/off.
 username = "admin"
 password = "admin"
 host = sys.argv[1]
 outlet = int(sys.argv[2])
 state = int(sys.argv[3])
-requests.get(f"http://{username}:{password}@{host}/cmd.cgi?$A3 {outlet} {state}", timeout=1.0)
+out = requests.get(f"http://{username}:{password}@{host}/cmd.cgi?$A3 {outlet} {state}", timeout=1.0).content.decode('utf-8')
+if out.strip() == "Success!":
+    # This outlet is not responding to the correct documented protocol,
+    # we must query the status and then flip the relay if needed.
+    if outlet == 1:
+        relay = "rly0"
+        outno = "0"
+    elif outlet == 2:
+        relay = "rly1"
+        outno = "1"
+    else:
+        raise Exception("Unknown outlet!")
+
+    response = requests.get(f"http://{username}:{password}@{host}/status.xml", timeout=1.0).content.decode('utf-8')
+    root = ET.fromstring(response)
+    if root.tag == "response":
+        for child in root:
+            if child.tag == relay:
+                current = "1" if child.text != '0' else "0"
+                new = "1" if state != 0 else "0"
+                if new != current:
+                    # Need to toggle
+                    requests.get(f"http://{username}:{password}@{host}/cmd.cgi?rly={outno}", timeout=1.0)
+
+                sys.exit(0)
+    raise Exception("Cannot determine status")
