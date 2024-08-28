@@ -54,9 +54,10 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--host", help="Host to ping. Defaults to 127.0.0.1", type=str, default="127.0.0.1")
     parser.add_argument("-p", "--port", help="Port to listen on. Defaults to 34567", type=int, default=34567)
     parser.add_argument("-d", "--debug", help="Enable debug mode. Defaults to off", action="store_true")
+    parser.add_argument("-t", "--timeout", help="Seconds before timing out a ping request", type=float, default=0.5)
     args = parser.parse_args()
 
-    polling_thread = PollingThread(args.host)
+    polling_thread = PollingThread(args.host, args.timeout)
     polling_thread.start()
 
     app.config['host'] = args.host
