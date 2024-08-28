@@ -1,4 +1,4 @@
-Utility for monitoring a local or remote IP for binary sensors in Home Assistant, since the functionality was taken out.
+Utility for monitoring a local or remote host for binary sensors in Home Assistant, since the functionality was taken out.
 
 Run it similar to:
 
@@ -36,4 +36,4 @@ binary_sensor:
    scan_interval: 1
 ```
 
-This will instruct Home Assistant to poll the endpoint once a second, with a one second timeout. If the host was marked up, the "Router Status" binary sensor will be marked as "connected". If it was marked down, the "Router Status" binary sensor will be marked as "disconnected". You can run multiple scripts to monitor multiple hosts. Just make sure to put them on different ports and to reference the correct port in your binary sensors. Also it goes without saying but don't be an idiot and point this at a box you don't own or shouldn't be pinging for connectivity checks.
+This will instruct Home Assistant to poll the endpoint once a second, with a one second timeout. If the host was marked up, the "Router Status" binary sensor will be marked as "connected". If it was marked down, the "Router Status" binary sensor will be marked as "disconnected". You can run multiple scripts to monitor multiple hosts. Just make sure to put them on different ports and to reference the correct port in your binary sensors. For the host you can place a domain name or a raw IP, depending on what works best. Also it goes without saying but don't be an idiot and point this at a box you don't own or shouldn't be pinging for connectivity checks.
